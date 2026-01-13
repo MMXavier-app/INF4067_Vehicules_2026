@@ -1,0 +1,80 @@
+-- Données de test pour les patrons de Raph
+-- Responsabilité: Raph
+
+-- ============ COMPOSITE PATTERN (Sociétés et filiales) ============
+
+-- Société mère
+INSERT INTO clients (dtype, nom, email, telephone) 
+VALUES ('Societe', 'AutoCorp SA', 'contact@autocorp.com', '+33123456789');
+
+INSERT INTO societes (client_id, siret, raison_sociale, capital) 
+VALUES (1, '12345678901234', 'AutoCorp Société Anonyme', 1000000.00);
+
+-- Filiales (Composite Pattern)
+INSERT INTO clients (dtype, nom, email, telephone, societe_mere_id) 
+VALUES ('Societe', 'AutoCorp Lyon', 'lyon@autocorp.com', '+33456789012', 1);
+
+INSERT INTO societes (client_id, siret, raison_sociale, capital) 
+VALUES (2, '23456789012345', 'AutoCorp Lyon SARL', 250000.00);
+
+INSERT INTO clients (dtype, nom, email, telephone, societe_mere_id) 
+VALUES ('Societe', 'AutoCorp Marseille', 'marseille@autocorp.com', '+33498765432', 1);
+
+INSERT INTO societes (client_id, siret, raison_sociale, capital) 
+VALUES (3, '34567890123456', 'AutoCorp Marseille SAS', 150000.00);
+
+-- Particuliers clients
+INSERT INTO clients (dtype, nom, email, telephone) 
+VALUES ('Particulier', 'Dupont', 'jean.dupont@email.com', '+33612345678');
+
+INSERT INTO particuliers (client_id, prenom, civilite) 
+VALUES (4, 'Jean', 'M');
+
+-- ============ VÉHICULES (pour Command Pattern - Soldes) ============
+
+INSERT INTO vehicules (dtype, modele, marque, prix_base, date_ajout_stock, en_stock, pourcentage_solde) 
+VALUES ('Automobile', 'Clio', 'Renault', 18500.00, '2024-01-15', true, 0.0);
+
+INSERT INTO vehicules (dtype, modele, marque, prix_base, date_ajout_stock, en_stock, pourcentage_solde) 
+VALUES ('Automobile', '308', 'Peugeot', 26500.00, '2023-06-10', true, 15.0);
+
+INSERT INTO vehicules (dtype, modele, marque, prix_base, date_ajout_stock, en_stock, pourcentage_solde) 
+VALUES ('Automobile', 'Model 3', 'Tesla', 42000.00, '2024-02-01', true, 0.0);
+
+-- Véhicule ancien en stock (pour Command Pattern - solde automatique)
+INSERT INTO vehicules (dtype, modele, marque, prix_base, date_ajout_stock, en_stock, pourcentage_solde) 
+VALUES ('Automobile', '208', 'Peugeot', 19500.00, '2023-01-01', true, 0.0);
+
+-- ============ COMMANDES (pour Template Method - Taxes) ============
+
+-- Commande avec TVA France (20%)
+INSERT INTO commandes (numero_commande, client_id, montant_total, montant_taxe, pays_livraison, taux_taxe_applique, etat) 
+VALUES ('CMD-2024-001', 1, 10000.00, 2000.00, 'FR', 0.20, 'PAYE');
+
+-- Commande avec TVA Belgique (21% avec réduction)
+INSERT INTO commandes (numero_commande, client_id, montant_total, montant_taxe, pays_livraison, taux_taxe_applique, etat) 
+VALUES ('CMD-2024-002', 2, 35000.00, 6615.00, 'BE', 0.21, 'VALIDE');
+
+-- Commande US
+INSERT INTO commandes (numero_commande, client_id, montant_total, montant_taxe, pays_livraison, taux_taxe_applique, etat) 
+VALUES ('CMD-2024-003', 4, 25000.00, 2125.00, 'US', 0.085, 'EN_COURS');
+
+-- ============ LIGNES DE COMMANDE ============
+
+INSERT INTO lignes_commande (commande_id, vehicule_id, quantite, prix_unitaire) 
+VALUES (1, 1, 1, 18500.00);
+
+INSERT INTO lignes_commande (commande_id, vehicule_id, quantite, prix_unitaire) 
+VALUES (2, 3, 1, 42000.00);
+
+INSERT INTO lignes_commande (commande_id, vehicule_id, quantite, prix_unitaire) 
+VALUES (3, 2, 1, 26500.00);
+
+-- ============ DONNÉES DE TEST COMPOSITE PATTERN ============
+
+-- Mise à jour des filiales dans la table societe_mere
+UPDATE clients SET societe_mere_id = 1 WHERE id IN (2, 3);
+
+-- Calcul du chiffre d'affaires total de la société mère (doit inclure les filiales)
+-- AutoCorp SA (id:1) + AutoCorp Lyon (id:2) + AutoCorp Marseille (id:3)
+-- Total attendu: 10000 + 35000 + 25000 = 70000
